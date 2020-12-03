@@ -42,8 +42,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    from pathlib import Path
-    with open(Path('./2020/input_files/AoC2020_day01_input.txt')) as f:
+    with open('./2020/input_files/AoC2020_day01_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))
