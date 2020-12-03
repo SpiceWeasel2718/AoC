@@ -1,5 +1,5 @@
 def part1(input_text):
-    entries = [int(n) for n in input_text]
+    entries = [int(n) for n in input_text.splitlines()]
     entries.sort()
 
     bottom_gen = iter(entries)
@@ -19,7 +19,7 @@ def part1(input_text):
 
 
 def part2(input_text):
-    entries = [int(n) for n in input_text]
+    entries = [int(n) for n in input_text.splitlines()]
     entries.sort()
 
     for third in entries:
@@ -44,7 +44,7 @@ def part2(input_text):
 if __name__ == '__main__':
     from pathlib import Path
     with open(Path('./2020/input_files/AoC2020_day01_input.txt')) as f:
-        input_text = f.read().splitlines()
+        input_text = f.read()
 
     print('part 1:', part1(input_text))
     print('part 2:', part2(input_text))
