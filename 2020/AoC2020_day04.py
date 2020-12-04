@@ -1,38 +1,31 @@
 def part1(input_text):
-    passport_blocks = input_text.split('\n\n')
-    passports = []
-    for block in passport_blocks:
-        passport = {}
-        for pair in block.split():
-            k, v = pair.split(':')
-            passport[k] = v
-        passports.append(passport)
-    
     required = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
     count = 0
-
-    for passport in passports:
-        count += all(field in passport for field in required)
+    
+    for block in input_text.split('\n\n'):
+        passport = set()
+        for pair in block.split():
+            passport.add(pair.split(':')[0])
+    
+        count += all(r in passport for r in required)
     
     return count
 
 
 def part2(input_text):
-    passport_blocks = input_text.split('\n\n')
-    passports = []
-    for block in passport_blocks:
+    required = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+    hexdigits = set('0123456789abcdef')
+    count = 0
+
+    for block in input_text.split('\n\n'):
         passport = {}
         for pair in block.split():
             k, v = pair.split(':')
             passport[k] = v
-        passports.append(passport)
     
-    required = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
-    count = 0
-
-    for passport in passports:
-        if not all(field in passport for field in required):
+        if not all(r in passport for r in required):
             continue
+
         if not all([
                 (1920 <= int(passport['byr']) <= 2002),
                 (2010 <= int(passport['iyr']) <= 2020),
@@ -41,7 +34,6 @@ def part2(input_text):
             continue
         
         hgt = passport['hgt']
-        
         if hgt.endswith('cm'):
             if not 150 <= int(hgt[:-2]) <= 193:
                 continue
@@ -50,9 +42,8 @@ def part2(input_text):
                 continue
         else:
             continue
-
+        
         hcl = passport['hcl']
-        hexdigits = set('0123456789abcdef')
         if len(hcl) != 7 or not hcl[0] == '#' or not all(c in hexdigits for c in hcl[1:]):
             continue
 
@@ -78,5 +69,5 @@ if __name__ == '__main__':
     import timeit
     p1_timer = timeit.Timer('part1(input_text)', globals=globals())
     p2_timer = timeit.Timer('part2(input_text)', globals=globals())
-    #print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.5f} seconds')
-    #print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.5f} seconds')
+    # print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.5f} seconds')
+    # print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.5f} seconds')
