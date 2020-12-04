@@ -44,5 +44,5 @@ if __name__ == '__main__':
     import timeit
     p1_timer = timeit.Timer('part1(input_text)', globals=globals())
     p2_timer = timeit.Timer('part2(input_text)', globals=globals())
-    #print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.5f} seconds')
-    #print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.5f} seconds')
+    print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.10f} seconds')
+    print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.10f} seconds')
