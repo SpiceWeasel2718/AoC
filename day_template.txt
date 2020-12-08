@@ -13,8 +13,11 @@ if __name__ == '__main__':
     print('part 1:', part1(input_text))
     print('part 2:', part2(input_text))
 
-    import timeit
-    p1_timer = timeit.Timer('part1(input_text)', globals=globals())
-    p2_timer = timeit.Timer('part2(input_text)', globals=globals())
-    # print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.5f} seconds')
-    # print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.5f} seconds')
+    time_execution = 1
+
+    if time_execution:
+        import timeit
+        for part in ['part1', 'part2']:
+            timer = timeit.Timer(f'{part}(input_text)', globals=globals())
+            n, time = timer.autorange()
+            print(f'{part} took {time/n:.5f} seconds on average when run {n} times')
