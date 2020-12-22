@@ -11,10 +11,7 @@ def part1(input_text):
         deck_2.append(int(line))
 
     while deck_1 and deck_2:
-        card_1 = deck_1.popleft()
-        card_2 = deck_2.popleft()
-
-        if card_1 > card_2:
+        if (card_1 := deck_1.popleft()) > (card_2 := deck_2.popleft()):
             deck_1.extend([card_1, card_2])
         else:
             deck_2.extend([card_2, card_1])
@@ -41,9 +38,7 @@ def part2(input_text):
             card_2 = deck_2.popleft()
 
             if len(deck_1) >= card_1 and len(deck_2) >= card_2:
-                sub_deck_1 = deque(islice(deck_1, card_1))
-                sub_deck_2 = deque(islice(deck_2, card_2))
-                if recursive_combat(sub_deck_1, sub_deck_2)[0]:
+                if recursive_combat(deque(islice(deck_1, card_1)), deque(islice(deck_2, card_2)))[0]:
                     deck_1.extend([card_1, card_2])
                 else:
                     deck_2.extend([card_2, card_1])
@@ -54,6 +49,7 @@ def part2(input_text):
                     deck_2.extend([card_2, card_1])
             
             state = (tuple(deck_1), tuple(deck_2))
+
             if state in history:
                 return True, deck_1
             else:
