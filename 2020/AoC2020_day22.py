@@ -7,6 +7,7 @@ def part1(input_text):
 
     for line in player_1.splitlines()[1:]:
         deck_1.append(int(line))
+    
     for line in player_2.splitlines()[1:]:
         deck_2.append(int(line))
 
@@ -38,15 +39,16 @@ def part2(input_text):
             card_2 = deck_2.popleft()
 
             if len(deck_1) >= card_1 and len(deck_2) >= card_2:
-                if recursive_combat(deque(islice(deck_1, card_1)), deque(islice(deck_2, card_2)))[0]:
-                    deck_1.extend([card_1, card_2])
-                else:
-                    deck_2.extend([card_2, card_1])
+                player_1_win = recursive_combat(deque(islice(deck_1, card_1)), deque(islice(deck_2, card_2)))[0]
             else:
-                if card_1 > card_2:
-                    deck_1.extend([card_1, card_2])
-                else:
-                    deck_2.extend([card_2, card_1])
+                player_1_win = (card_1 > card_2)
+            
+            if player_1_win:
+                deck_1.append(card_1)
+                deck_1.append(card_2)
+            else:
+                deck_2.append(card_2)
+                deck_2.append(card_1)
             
             state = (tuple(deck_1), tuple(deck_2))
 
