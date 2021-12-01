@@ -1,13 +1,17 @@
 def part1(input_text):
-    pass
+    depths = [int(n) for n in input_text.split()]
+    
+    return sum((a < b) for a, b in zip(depths, depths[1:]))
 
 
 def part2(input_text):
-    pass
+    depths = [int(n) for n in input_text.split()]
+    
+    return sum((a < b) for a, b in zip(depths, depths[3:]))
 
 
 if __name__ == '__main__':
-    with open('./input_files/<input_file>') as f:
+    with open('./input_files/AoC2021_day01_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))
