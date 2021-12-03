@@ -1,56 +1,50 @@
 def part1(input_text):
     numbers = input_text.splitlines()
-    count = [0] * len(numbers[0])
+    bits = len(numbers[0])
+    count = [0] * bits
 
-    for number in numbers:
-        for i, c in enumerate(number):
-            count[i] += (c == '1')
+    for i in range(bits):
+        count[i] = sum((n[i] == '1') for n in numbers)
 
     gamma = 0
     half = len(numbers) / 2
 
-    for i, n in enumerate(reversed(count)):
-        if n > half:
-            gamma += 2**i
+    for c in count:
+        gamma <<= 1
+        gamma += (c > half)
     
-    return gamma * (gamma ^ (2**len(count) - 1))
+    return gamma * (gamma ^ (2**bits - 1))
 
 
 def part2(input_text):
-    numbers_str = input_text.splitlines()
-    numbers = [int(n, base=2) for n in numbers_str]
-    partitions = [[set(), set()] for __ in range(len(numbers_str[0]))]
+    numbers = input_text.splitlines()
+    bits = len(numbers[0])
+    binary = [int(n, 2) for n in numbers]
 
-    for n, s in zip(numbers, numbers_str):
-        for i, c in enumerate(s):
-            partitions[i][(c == '1')].add(n)
+    def partition(num_list, mask):
+        if len(num_list) <= 1:
+            return num_list
 
-    if len(partitions[0][1]) >= len(numbers) / 2:
-        uncommon, common = partitions[0]
-    else:
-        common, uncommon = partitions[0]
-    
-    i = 1
-
-    while len(common) > 1:
-        zeros = common & partitions[i][0]
-        ones = common & partitions[i][1]
-
-        common = ones if len(ones) >= len(zeros) else zeros
-        i += 1
-
-    i = 1
-
-    while len(uncommon) > 1:
-        zeros = uncommon & partitions[i][0]
-        ones = uncommon & partitions[i][1]
+        ones = []
+        zeros = []
         
-        uncommon = ones if len(ones) < len(zeros) else zeros
-        i += 1
+        for n in num_list:
+            if n & mask:
+                ones.append(n)
+            else:
+                zeros.append(n)
+        
+        return (ones, zeros) if len(ones) >= len(zeros) else (zeros, ones)
+        
+    mask = 1 << (bits - 1)
+    common, uncommon = partition(binary, mask)
 
-    return common.pop() * uncommon.pop()
+    while len(common) > 1 and len(uncommon) > 1:
+        mask >>= 1
+        common, __ = partition(common, mask)
+        __, uncommon = partition(uncommon, mask)        
     
-
+    return common[0] * uncommon[0]
     
 
 if __name__ == '__main__':
