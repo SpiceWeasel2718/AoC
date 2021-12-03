@@ -5,9 +5,9 @@ def part1(input_text):
     for line in input_text.splitlines():
         d, n = line.split()
 
-        if d.startswith('d'):
+        if d == "down":
             depth += int(n)
-        elif d.startswith('u'):
+        elif d == "up":
             depth -= int(n)
         else:
             horiz += int(n)
@@ -23,9 +23,9 @@ def part2(input_text):
     for line in input_text.splitlines():
         d, n = line.split()
 
-        if d.startswith('d'):
+        if d == "down":
             aim += int(n)
-        elif d.startswith('u'):
+        elif d == "up":
             aim -= int(n)
         else:
             horiz += int(n)
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     print('part 1:', part1(input_text))
     print('part 2:', part2(input_text))
 
-    time_execution = 0
+    time_execution = 1
 
     if time_execution:
         import timeit
