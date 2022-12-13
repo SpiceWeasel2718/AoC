@@ -1,8 +1,8 @@
-def part1(input_text):
+def part1(input_text: str):
     pass
 
 
-def part2(input_text):
+def part2(input_text: str):
     pass
 
 
