@@ -1,4 +1,4 @@
-def part1(input_text):
+def part1(input_text: str):
     directions = {
         'R': 1,
         'L': -1,
@@ -30,7 +30,7 @@ def part1(input_text):
     return len(memory)
 
 
-def part2(input_text):
+def part2(input_text: str):
     directions = {
         'R': 1,
         'L': -1,
@@ -65,7 +65,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    with open('./input_files/AoC2022_day09_input.txt') as f:
+    with open('2022/input_files/AoC2022_day09_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))

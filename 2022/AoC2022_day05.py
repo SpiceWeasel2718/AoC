@@ -1,4 +1,4 @@
-def part1(input_text):
+def part1(input_text: str):
     input_lines = input_text.splitlines()
 
     for i in range(100):
@@ -29,7 +29,7 @@ def part1(input_text):
     return ''.join(stacks[i+1][-1] for i in range(n_stacks))
 
 
-def part2(input_text):
+def part2(input_text: str):
     input_lines = input_text.splitlines()
 
     for i in range(100):
@@ -61,7 +61,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    with open('./input_files/AoC2022_day05_input.txt') as f:
+    with open('2022/input_files/AoC2022_day05_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))

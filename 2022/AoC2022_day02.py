@@ -1,4 +1,4 @@
-def part1(input_text):
+def part1(input_text: str):
     scores = {
         'X': 1,
         'Y': 2,
@@ -23,7 +23,7 @@ def part1(input_text):
     return s
 
 
-def part2(input_text):
+def part2(input_text: str):
     scores = {
         'A': 1,
         'B': 2,
@@ -46,7 +46,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    with open('./input_files/AoC2022_day02_input.txt') as f:
+    with open('2022/input_files/AoC2022_day02_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))

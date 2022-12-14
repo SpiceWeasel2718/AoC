@@ -1,4 +1,4 @@
-def part1(input_text):
+def part1(input_text: str):
     from collections import deque
 
     stream = input_text[:-1]
@@ -11,7 +11,7 @@ def part1(input_text):
             return n
 
 
-def part2(input_text):
+def part2(input_text: str):
     from collections import deque
 
     stream = input_text[:-1]
@@ -25,7 +25,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    with open('./input_files/AoC2022_day06_input.txt') as f:
+    with open('2022/input_files/AoC2022_day06_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))

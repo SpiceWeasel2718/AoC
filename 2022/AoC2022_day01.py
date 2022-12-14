@@ -1,4 +1,4 @@
-def part1(input_text):
+def part1(input_text: str):
     m = 0
     temp = 0
 
@@ -12,7 +12,7 @@ def part1(input_text):
     return m
 
 
-def part2(input_text):
+def part2(input_text: str):
     import heapq
     
     top3 = []
@@ -33,7 +33,7 @@ def part2(input_text):
 
 
 if __name__ == '__main__':
-    with open('./input_files/AoC2022_day01_input.txt') as f:
+    with open('2022/input_files/AoC2022_day01_input.txt') as f:
         input_text = f.read()
 
     print('part 1:', part1(input_text))
