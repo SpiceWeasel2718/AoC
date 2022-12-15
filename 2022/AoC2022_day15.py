@@ -1,65 +1,82 @@
 def part1(input_text: str):
     import re
     
-    sensors = []
+    intervals = set()
     beacons = set()
+    y = 2000000
     
     for line in input_text.splitlines():
-        sx, sy, bx, by = [int(s[1:]) for s in re.findall(r'=-?\d+', line)]
-        sensors.append((sx + sy*1j, abs(bx-sx) + abs(by-sy)))
-        beacons.add(bx + by*1j)
-    
-    y = 2000000
-    min_x = int(min(s[0].real - s[1] for s in sensors))
-    max_x = int(max(s[0].real + s[1] for s in sensors))
-    count = 0
-    
-    for x in range(min_x, max_x + 1):
-        pos = x + y*1j
-        if pos in beacons:
-            continue
-        for s_pos, s_dist in sensors:
-            diff = s_pos - pos
-            if abs(diff.real) + abs(diff.imag) <= s_dist:
-                count += 1
-                break
-    
-    return count
+        sx, sy, bx, by = [int(s[0]) for s in re.finditer(r'-?\d+', line)]
+        
+        if by == y:
+            beacons.add(bx)
+        
+        rad = abs(bx - sx) + abs(by - sy)
+        dist = rad - abs(sy - y)
+        if dist >= 0:
+            left, right = sx - dist, sx + dist
+            to_merge = []
+            
+            for interval in intervals:
+                i_left, i_right = interval
+                
+                if any([i_left <= left <= i_right, 
+                       i_left <= right <= i_right,
+                       left <= i_left <= right,
+                       left <= i_right <= right]):
+                    
+                    to_merge.append(interval)
+            
+            for interval in to_merge:
+                intervals.remove(interval)
+                i_left, i_right = interval
+                left = min(left, i_left)
+                right = max(right, i_right)
+            
+            intervals.add((left, right))
+            
+    return sum(r - l + 1 for l, r in intervals) - len(beacons)
 
 
 def part2(input_text: str):
     import re
     
     sensors = []
-    beacons = set()
+    pos_slope = []
+    neg_slope = []
     
     for line in input_text.splitlines():
-        sx, sy, bx, by = [int(s[1:]) for s in re.findall(r'=-?\d+', line)]
-        sensors.append((sx + sy*1j, abs(bx-sx) + abs(by-sy)))
-        beacons.add(bx + by*1j)
-    
+        sx, sy, bx, by = [int(s[0]) for s in re.finditer(r'-?\d+', line)]
+        dist = abs(bx - sx) + abs(by - sy) + 1
+        sensors.append((sx + sy*1j, dist))
+        
+        left = sx - dist
+        pos_slope.append(left - sy)
+        neg_slope.append(left + sy)
+        right = sx + dist
+        pos_slope.append(right - sy)
+        neg_slope.append(right + sy)
+        
     max_val = 4000000
-
-    for s_pos, s_dist in sensors:
-        for start, direction in [
-                (s_pos + s_dist + 1, -1-1j),
-                (s_pos - s_dist*1j - 1j, -1+1j),
-                (s_pos - s_dist - 1, 1+1j),
-                (s_pos + s_dist*1j + 1j, 1-1j),
-                ]:
-            pos = start
-            for __ in range(s_dist + 1):
-                if 0 <= pos.real <= max_val and 0 <= pos.imag <= max_val:
-                    for test_pos, test_dist in sensors:
-                        if test_pos == s_pos:
-                            continue
-                        diff = test_pos - pos
-                        if abs(diff.real) + abs(diff.imag) <= test_dist:
-                            break
-                    else:
-                        return int(pos.real * 4000000 + pos.imag)
-                
-                pos += direction
+    max_dist = 2 * max_val
+    intersections = []
+    
+    for pos in pos_slope:
+        for neg in neg_slope:
+            dist = abs(neg - pos)
+            if dist <= max_dist and dist % 2 == 0:
+                y = dist // 2
+                x = min(pos, neg) + y
+                if 0 <= x <= max_val:
+                    intersections.append(x + y*1j)
+    
+    for point in intersections:
+        for sensor, dist in sensors:
+            diff = sensor - point
+            if abs(diff.real) + abs(diff.imag) < dist:
+                break
+        else:
+            return int(point.real * 4000000 + point.imag)
 
 
 if __name__ == '__main__':
