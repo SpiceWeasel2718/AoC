@@ -67,8 +67,8 @@ def part2(input_text: str):
                 y = dist // 2
                 x = min(pos, neg) + y
                 if 0 <= x <= max_val:
-                    for sx, sy, dist in sensors:
-                        if abs(sx - x) + abs(sy - y) < dist:
+                    for sx, sy, s_dist in sensors:
+                        if abs(sx - x) + abs(sy - y) < s_dist:
                             break
                     else:
                         return x * 4000000 + y
