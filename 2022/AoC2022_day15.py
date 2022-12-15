@@ -48,7 +48,7 @@ def part2(input_text: str):
     for line in input_text.splitlines():
         sx, sy, bx, by = [int(s[0]) for s in re.finditer(r'-?\d+', line)]
         dist = abs(bx - sx) + abs(by - sy) + 1
-        sensors.append((sx + sy*1j, dist))
+        sensors.append((sx, sy, dist))
         
         left = sx - dist
         pos_slope.append(left - sy)
@@ -59,7 +59,6 @@ def part2(input_text: str):
         
     max_val = 4000000
     max_dist = 2 * max_val
-    intersections = []
     
     for pos in pos_slope:
         for neg in neg_slope:
@@ -68,15 +67,11 @@ def part2(input_text: str):
                 y = dist // 2
                 x = min(pos, neg) + y
                 if 0 <= x <= max_val:
-                    intersections.append(x + y*1j)
-    
-    for point in intersections:
-        for sensor, dist in sensors:
-            diff = sensor - point
-            if abs(diff.real) + abs(diff.imag) < dist:
-                break
-        else:
-            return int(point.real * 4000000 + point.imag)
+                    for sx, sy, dist in sensors:
+                        if abs(sx - x) + abs(sy - y) < dist:
+                            break
+                    else:
+                        return x * 4000000 + y
 
 
 if __name__ == '__main__':
