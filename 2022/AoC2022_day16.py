@@ -78,7 +78,7 @@ def part1(input_text: str):
             if new_time_left >= 0:
                 new_pressure = pressure + new_time_left * rates[v]
                 most_pressure = max(most_pressure, new_pressure)
-                if new_time_left > 0:
+                if new_time_left > 0 and new_pressure + sum(rates[vv] * new_time_left for vv in unseen) > most_pressure:
                     paths.append((v, unseen - {v}, new_time_left, new_pressure))
 
     return most_pressure
@@ -170,14 +170,14 @@ def part2(input_text: str):
                 if u_new_time_left >= 0:
                     new_pressure = pressure + u_new_time_left * rates[v]
                     most_pressure = max(most_pressure, new_pressure)
-                    if u_new_time_left > 0 and e_time_left > 0:
+                    if u_new_time_left > 0 and e_time_left > 0 and new_pressure + sum(rates[vv] * max(u_new_time_left, e_time_left) for vv in unseen) > most_pressure:
                         paths.append((v, e_current, u_new_time_left, e_time_left, unseen - {v}, new_pressure))
             else:
                 e_new_time_left = e_time_left - distances[e_current][v] - 1
                 if e_new_time_left >= 0:
                     new_pressure = pressure + e_new_time_left * rates[v]
                     most_pressure = max(most_pressure, new_pressure)
-                    if e_new_time_left > 0 and u_time_left > 0:
+                    if e_new_time_left > 0 and u_time_left > 0 and new_pressure + sum(rates[vv] * max(e_new_time_left, u_time_left) for vv in unseen) > most_pressure:
                         paths.append((u_current, v, u_time_left, e_new_time_left, unseen - {v}, new_pressure))
             
     return most_pressure
