@@ -6,41 +6,42 @@ def part1(input_text: str):
     for a, line in enumerate(input_text.splitlines()):
         for b, c in enumerate(line):
             if c == '#':
-                elves[b - a*1j] = 0
+                elf = b - a*1j
+                elves[elf] = elf
     
-    directions = deque([[-1+1j, 1j, 1+1j],
-                        [-1-1j, -1j, 1-1j],
-                        [-1+1j, -1, -1-1j],
-                        [1+1j, 1, 1-1j]])
-
+    cardinals = deque([0, 4, 6, 2])
     nbrs = [1j, 1+1j, 1, 1-1j, -1j, -1-1j, -1, -1+1j]
     
     for __ in range(10):
         proposals = Counter()
 
         for elf in elves:
-            if any(elf + d in elves for d in nbrs):
-                for direction in directions:
-                    if all(elf + d not in elves for d in direction):
-                        d = direction[1]
-                        elves[elf] = elf + d
-                        proposals[elf + d] += 1
+            current_nbrs = [elf + d for d in nbrs]
+            
+            if any(nbrs_present := [(nbr in elves) for nbr in current_nbrs]):
+                n, ne, e, se, s, sw, w, nw = nbrs_present
+                nbrs_in_card = {0: [n, nw, ne],
+                                4: [s, sw, se],
+                                6: [w, nw, sw],
+                                2: [e, ne, se],}
+            
+                for card in cardinals:
+                    if not any(nbrs_in_card[card]):
+                        prop = current_nbrs[card]
+                        elves[elf] = prop
+                        proposals[prop] += 1
                         break
-                else:
-                    elves[elf] = elf
-            else:
-                elves[elf] = elf
         
         new_elves = {}
         
         for elf, prop in elves.items():
             if proposals[prop] <= 1:
-                new_elves[prop] = 0
+                new_elves[prop] = prop
             else:
-                new_elves[elf] = 0
+                new_elves[elf] = elf
         
         elves = new_elves
-        directions.rotate(-1)
+        cardinals.rotate(-1)
         
     x_min = min(elf.real for elf in elves)
     x_max = max(elf.real for elf in elves)
@@ -51,55 +52,55 @@ def part1(input_text: str):
 
 
 def part2(input_text: str):
-    from collections import deque, defaultdict
+    from collections import deque, Counter
     
     elves = {}
     
     for a, line in enumerate(input_text.splitlines()):
         for b, c in enumerate(line):
             if c == '#':
-                elves[b - a*1j] = 0
+                elf = b - a*1j
+                elves[elf] = elf
     
-    directions = deque([[-1+1j, 1j, 1+1j],
-                        [-1-1j, -1j, 1-1j],
-                        [-1+1j, -1, -1-1j],
-                        [1+1j, 1, 1-1j]])
-
+    cardinals = deque([0, 4, 6, 2])
     nbrs = [1j, 1+1j, 1, 1-1j, -1j, -1-1j, -1, -1+1j]
-    
     moved = True
     count = 0
     
     while moved:
         moved = False
         count += 1
-        proposals = defaultdict(int)
+        proposals = Counter()
 
         for elf in elves:
-            if any(elf + d in elves for d in nbrs):
-                for direction in directions:
-                    if all(elf + d not in elves for d in direction):
-                        d = direction[1]
-                        elves[elf] = elf + d
-                        proposals[elf + d] += 1
+            current_nbrs = [elf + d for d in nbrs]
+            
+            if any(nbrs_present := [(nbr in elves) for nbr in current_nbrs]):
+                n, ne, e, se, s, sw, w, nw = nbrs_present
+                nbrs_in_card = {0: [n, nw, ne],
+                                4: [s, sw, se],
+                                6: [w, nw, sw],
+                                2: [e, ne, se],}
+            
+                for card in cardinals:
+                    if not any(nbrs_in_card[card]):
+                        prop = current_nbrs[card]
+                        elves[elf] = prop
+                        proposals[prop] += 1
                         break
-                else:
-                    elves[elf] = elf
-            else:
-                elves[elf] = elf
         
         new_elves = {}
         
         for elf, prop in elves.items():
             if elf != prop and proposals[prop] <= 1:
-                new_elves[prop] = 0
                 moved = True
+                new_elves[prop] = prop
             else:
-                new_elves[elf] = 0
+                new_elves[elf] = elf
         
         elves = new_elves
-        directions.rotate(-1)
-    
+        cardinals.rotate(-1)
+        
     return count
 
 
