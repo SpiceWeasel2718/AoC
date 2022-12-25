@@ -69,48 +69,90 @@ def part1(input_text: str):
 def part2(input_text: str):
     import re
     
+    input_lines = input_text.splitlines()
     board = {}
-    loop = {}
     
-    for a, line in enumerate(input_text.splitlines(), 1):
-        if not line:
-            continue
-        
-        if not line[0].isnumeric():
-            l = 0
-            
-            for b, c in enumerate(line, 1):
-                if c == '.':
-                    board[a + b*1j] = False
-                elif c == '#':
-                    board[a + b*1j] = True
-        else:
-            path = line
-    
-    for i in range(1, 51):
-        loop[i + 50*1j] = (151 - i + 1j, 1j)
-        loop[100 + i + 0*1j] = (51 - i + 51*1j, 1j)
-        
-        loop[i + 151*1j] = (151 - i + 100*1j, -1j)
-        loop[100 + i + 101*1j] = (51 - i + 150*1j, -1j)
-        
-        loop[50 + i + 50*1j] = (101 + i*1j, 1)
-        loop[100 + i*1j] = (50 + i + 51*1j, 1j)
-        
-        loop[50 + i + 101*1j] = (50 + (100 + i)*1j, -1)
-        loop[51 + (100 + i)*1j] = (50 + i + 100*1j, -1j)
-        
-        loop[150 + i + 0*1j] = (1 + (50 + i)*1j , 1)
-        loop[0 + (50 + i)*1j] = (150 + i + 1j, 1j)
-        
-        loop[150 + i + 51*1j] = (150 + (50 + i)*1j , -1)
-        loop[151 + (50 + i)*1j] = (150 + i + 50*1j, -1j)
-        
-        loop[201 + i*1j] = (1 + (100 + i)*1j , 1)
-        loop[0 + (100 + i)*1j] = (200 + i*1j, -1)
-    
+    for a, line in enumerate(input_lines[:-2], 1):
+        for b, c in enumerate(line, 1):
+            if c == '.':
+                board[a + b*1j] = False
+            elif c == '#':
+                board[a + b*1j] = True
+
+    path = input_lines[-1]
     distances = [int(n) for n in re.findall(r'\d+', path)]
     turns_iter = iter(map(lambda rl : -1j if rl == 'R' else 1j, re.findall(r'\D', path)))
+    
+    bdry = {}
+    edges = []
+    edge_length = 50
+    d = edge_length - 1
+    corners = [d+d*1j, d*1j, 0, d]
+    
+    for a in range(1, 5*edge_length, edge_length):
+        for b in range(1, 5*edge_length, edge_length):
+            z = a + b*1j
+            if z not in board:
+                continue
+            
+            normal = 1j
+            
+            for c in [z + w for w in corners]:
+                if c + normal not in board:
+                    pair = c + normal + normal*-1j
+                    if pair in board:
+                        pair_normal = normal*1j
+                        dc = pair_normal
+                        dp = normal
+                        for i in range(edge_length):
+                            e1 = c + i*dc
+                            e2 = pair + i*dp
+                            bdry[(e1 + normal, normal)] = (e2, -pair_normal)
+                            bdry[(e2 + pair_normal, pair_normal)] = (e1, -normal)
+                    else:
+                        edges.append((c, normal))
+                normal *= 1j
+    
+    while edges:
+        new_edges = []
+        
+        for c, normal in edges:
+            if c + normal in bdry:
+                continue
+            
+            pair = None
+            zn = normal*-1j
+            z = c + zn
+            
+            if z in board:
+                wn = normal
+                w = z + wn
+                if (w, wn) in bdry:
+                    pair, v = bdry[(w, wn)]
+                    pair_normal = v*1j
+            elif (z, zn) in bdry:
+                bz, bzn = bdry[(z, zn)]
+                wn = bzn*1j
+                w = bz + wn
+                if w in board:
+                    pair = w
+                    pair_normal = wn*1j
+                elif (w, wn) in bdry:
+                    pair, v = bdry[(w, wn)]
+                    pair_normal = v*1j
+            
+            if pair is not None:
+                dc = normal*1j
+                dp = pair_normal*-1j
+                for i in range(edge_length):
+                    e1 = c + i*dc
+                    e2 = pair + i*dp
+                    bdry[(e1 + normal, normal)] = (e2, -pair_normal)
+                    bdry[(e2 + pair_normal, pair_normal)] = (e1, -normal)
+            else:
+                new_edges.append((c, normal))
+        
+        edges = new_edges
     
     pos = 1 + min(z.imag for z in board if z.real == 1)*1j
     facing = 1j
@@ -120,7 +162,7 @@ def part2(input_text: str):
             new_pos = pos + facing
             
             if new_pos not in board:
-                new_pos, new_facing = loop[new_pos]
+                new_pos, new_facing = bdry[(new_pos, facing)]
                 
                 if board[new_pos]:
                     break
