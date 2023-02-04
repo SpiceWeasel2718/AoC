@@ -159,3 +159,96 @@ class IntComp:
                 return self.outputs
             
             self.pos += self.OPCODE_NPARAMS[opcode] + 1
+
+
+# import collections
+import asyncio
+
+class IntcodeComputer:
+    def __init__(self, init_state=None):
+        self.state = collections.defaultdict(int)
+        self.init_state = init_state
+        self.pos_pointer = 0
+        self.rel_base = 0
+        self.input_queue = asyncio.Queue()
+        self.output_queue = asyncio.Queue()
+        
+    def load_program(self, intcode_string):
+        for k, v in enumerate(intcode_string.split(',')):
+            self.state[k] = int(v)
+        self.init_state = self.state.copy()
+    
+    def set_input_queue(self, input_queue):
+        self.input_queue = input_queue
+    
+    def set_output_queue(self, output_queue):
+        self.output_queue = output_queue
+    
+    OPCODE_NPARAMS = {
+        1: 3, 
+        2: 3, 
+        3: 1, 
+        4: 1, 
+        5: 2, 
+        6: 2, 
+        7: 3, 
+        8: 3, 
+        9: 1,
+        99: 0
+    }
+
+    async def run(self):
+        while True:
+            param_modes, opcode = divmod(self.state[self.pos_pointer], 100)
+
+            param_pointers = []
+
+            for i in range(self.pos_pointer + 1, self.pos_pointer + self.OPCODE_NPARAMS[opcode] + 1):
+                param_modes, mode = divmod(param_modes, 10)
+
+                if mode == 0:  # position
+                    param_pointers.append(self.state[i])
+                elif mode == 1:  # immediate
+                    param_pointers.append(i)
+                elif mode == 2:  # relative
+                    param_pointers.append(self.state[i] + self.rel_base)
+
+            if opcode == 1:  # add
+                p1, p2, p3 = param_pointers
+                self.state[p3] = self.state[p1] + self.state[p2]
+            elif opcode == 2:  # multiply
+                p1, p2, p3 = param_pointers
+                self.state[p3] = self.state[p1] * self.state[p2]
+            elif opcode == 3:  # input
+                self.state[param_pointers[0]] = await self.input_queue.get()
+            elif opcode == 4:  # output
+                await self.output_queue.put(self.state[param_pointers[0]])
+            elif opcode == 5:  # jump-if-true
+                if self.state[param_pointers[0]]:
+                    self.pos_pointer = self.state[param_pointers[1]] - self.OPCODE_NPARAMS[opcode] - 1
+            elif opcode == 6:  # jump-if-false
+                if not self.state[param_pointers[0]]:
+                    self.pos_pointer = self.state[param_pointers[1]] - self.OPCODE_NPARAMS[opcode] - 1
+            elif opcode == 7:  # less than
+                p1, p2, p3 = param_pointers
+                self.state[p3] = (self.state[p1] < self.state[p2])
+            elif opcode == 8:  # equals
+                p1, p2, p3 = param_pointers
+                self.state[p3] = (self.state[p1] == self.state[p2])
+            elif opcode == 9:  # adjust relative base
+                self.rel_base += self.state[param_pointers[0]]
+            elif opcode == 99:
+                return
+
+            self.pos_pointer += self.OPCODE_NPARAMS[opcode] + 1
+
+
+if __name__ == "__main__":
+    with open("input_files/AoC2019_day05_input.txt") as f:
+        program = f.read().strip()
+    
+    ic = IntcodeComputer()
+    ic.load_program(program)
+    ic.input_queue.put_nowait(5)
+    asyncio.run(ic.run())
+    print(ic.output_queue)

@@ -1,27 +1,13 @@
 def part1(input_text: str):
-    return sum(int(line) for line in input_text.splitlines())
+    pass
 
 
 def part2(input_text: str):
-    from itertools import cycle
-
-    shifts = [int(n) for n in input_text.splitlines()]
-    seen = set()
-    freq = 0
-
-    for shift in cycle(shifts):
-        freq += shift
-        if freq in seen:
-            return freq
-        seen.add(freq)
+    pass
 
 
 if __name__ == '__main__':
-    from pathlib import Path
-
-    path = Path(__file__).parent
-
-    with open(path / 'input_files/AoC2018_day01_input.txt') as f:
+    with open('2021/input_files/AoC2021_day25_input.txt') as f:
         input_text = f.read()
     
     print('part 1:', part1(input_text))
