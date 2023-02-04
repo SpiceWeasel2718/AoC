@@ -51,30 +51,46 @@ class Processor:
         return count
     
 
-def part1(input_text):
+def part1(input_text: str):
     proc = Processor(input_text)
     return proc.execute()
 
 
-def part2(input_text):
+def part2(input_text: str):
+    # By inspection, the value of h on exit is the number of non-prime values 
+    # b takes between its start and end (inclusive)
+    from math import sqrt, ceil
+
+    start = 109900
+    end = 126900
+    inc = 17
+    h = 0
+
+    for b in range(start, end+1, inc):
+        for n in range(2, ceil(sqrt(b))):
+            if b % n == 0:
+                h += 1
+                break
     
-    
-    
-    
-    # proc = Processor(input_text)
-    # return proc.execute(a=1)
+    return h
 
 
 if __name__ == '__main__':
     from pathlib import Path
-    with open(next(Path().glob('**/AoC2017_day23_input.txt'))) as f:
-        input_text = f.read().splitlines()
 
+    path = Path(__file__).parent
+
+    with open(path / 'input_files/AoC2017_day23_input.txt') as f:
+        input_text = f.read()
+    
     print('part 1:', part1(input_text))
     print('part 2:', part2(input_text))
 
-    import timeit
-    p1_timer = timeit.Timer('part1(input_text)', globals=globals())
-    p2_timer = timeit.Timer('part2(input_text)', globals=globals())
-    #print(f'part1 took at least {min(p1_timer.repeat(number=1)) :.5f} seconds')
-    #print(f'part2 took at least {min(p2_timer.repeat(number=1)) :.5f} seconds')
+    time_execution = 0
+
+    if time_execution:
+        import timeit
+        for part in ['part1', 'part2']:
+            timer = timeit.Timer(f'{part}(input_text)', globals=globals())
+            n, time = timer.autorange()
+            print(f'{part} took {time/n:.5f} seconds on average when run {n} times')
