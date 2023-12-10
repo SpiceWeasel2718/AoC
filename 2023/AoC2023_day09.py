@@ -45,10 +45,6 @@ if __name__ == '__main__':
 
     with open(path / 'input_files/AoC2023_day09_input.txt') as f:
         input_text = f.read()
-    
-#     input_text = '''0 3 6 9 12 15
-# 1 3 6 10 15 21
-# 10 13 16 21 30 45'''
 
     print('part 1:', part1(input_text))
     print('part 2:', part2(input_text))
