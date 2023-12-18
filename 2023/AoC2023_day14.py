@@ -1,27 +1,27 @@
 def part1(input_text: str):
     platform = {}
     entities = {'.': 0, '#': -1, 'O': 1}
-    text_lines = input_text.splitlines()
-    n_lines = len(text_lines)
-    n_cols = len(text_lines[0])
 
-    for a, line in enumerate(text_lines):
+    for a, line in enumerate(lines := input_text.splitlines()):
         for b, c in enumerate(line):
             platform[a+b*1j] = entities[c]
     
-    for a in range(n_lines):
+    n_rows = len(lines)
+    n_cols = len(lines[0])
+
+    for a in range(n_rows):
         for b in range(n_cols):
             z = a + b*1j
             if platform[z] == 1:
-                while z-1 in platform and platform[z-1] == 0:
+                while (w := z-1) in platform and platform[w] == 0:
                     platform[z] = 0
-                    platform[z-1] = 1
-                    z = z-1
+                    platform[w] = 1
+                    z = w
     
     load = 0
 
-    for a in range(n_lines):
-        load += (n_lines - a) * len([platform[a+b*1j] for b in range(n_cols) if platform[a+b*1j] == 1])
+    for a in range(n_rows):
+        load += (n_rows - a) * [platform[a+b*1j] for b in range(n_cols)].count(1)
     
     return load
 
@@ -29,58 +29,38 @@ def part1(input_text: str):
 def part2(input_text: str):
     platform = {}
     entities = {'.': 0, '#': -1, 'O': 1}
-    text_lines = input_text.splitlines()
-    n_lines = len(text_lines)
-    n_cols = len(text_lines[0])
-
-    for a, line in enumerate(text_lines):
+    
+    for a, line in enumerate(lines := input_text.splitlines()):
         for b, c in enumerate(line):
             platform[a+b*1j] = entities[c]
     
+    n_rows = len(lines)
+    n_cols = len(lines[0])
+    
     def cycle(platform):
-        for a in range(n_lines):
-            for b in range(n_cols):
-                z = a + b*1j
-                if platform[z] == 1:
-                    while z-1 in platform and platform[z-1] == 0:
-                        platform[z] = 0
-                        platform[z-1] = 1
-                        z = z-1
-        for a in range(n_lines):
-            for b in range(n_cols):
-                z = b + a*1j
-                if platform[z] == 1:
-                    while z-1j in platform and platform[z-1j] == 0:
-                        platform[z] = 0
-                        platform[z-1j] = 1
-                        z = z-1j
-        for a in range(n_lines-1, -1, -1):
-            for b in range(n_cols):
-                z = a + b*1j
-                if platform[z] == 1:
-                    while z+1 in platform and platform[z+1] == 0:
-                        platform[z] = 0
-                        platform[z+1] = 1
-                        z = z+1
-        for a in range(n_lines):
-            for b in range(n_cols-1, -1, -1):
-                z = a + b*1j
-                if platform[z] == 1:
-                    while z+1j in platform and platform[z+1j] == 0:
-                        platform[z] = 0
-                        platform[z+1j] = 1
-                        z = z+1j
+        for offset, d in [(0, 1), 
+                          (n_rows-1, 1j), 
+                          ((n_rows-1 + (n_cols-1)*1j), -1), 
+                          ((n_cols-1)*1j, -1j)]:
+            for a in range(n_rows):
+                for b in range(n_cols):
+                    z = (a + b*1j) * d + offset
+                    if platform[z] == 1:
+                        while (w := z-d) in platform and platform[w] == 0:
+                            platform[z] = 0
+                            platform[w] = 1
+                            z = w
         return platform
     
-    def encode(platform):
+    def encode_state(platform):
         n = 0
-        for a in range(n_lines):
+        for a in range(n_rows):
             for b in range(n_cols):
                 n <<= 1
-                n += platform[a+b*1j]
+                n += (platform[a+b*1j] == 1)
         return n
 
-    state = encode(platform)
+    state = encode_state(platform)
     seen = set()
     history = []
 
@@ -88,7 +68,7 @@ def part2(input_text: str):
         seen.add(state)
         history.append(state)
         platform = cycle(platform)
-        state = encode(platform)
+        state = encode_state(platform)
 
     loop_start = history.index(state)
     loop_len = len(history) - loop_start
@@ -99,8 +79,8 @@ def part2(input_text: str):
 
     load = 0
 
-    for a in range(n_lines):
-        load += (n_lines - a) * len([platform[a+b*1j] for b in range(n_cols) if platform[a+b*1j] == 1])
+    for a in range(n_rows):
+        load += (n_rows - a) * [platform[a+b*1j] for b in range(n_cols)].count(1)
     
     return load
 
